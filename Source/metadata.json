@@ -1,0 +1,10 @@
+{
+    "index": {
+        "es_index_as_filename": true,
+        "es_index_name": ""
+    },
+    "data": {
+         "headers": [],
+         "id_field": ""
+    }
+}

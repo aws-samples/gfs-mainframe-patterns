@@ -1,0 +1,12 @@
+{
+    "s3": {
+        "bucket": "athenas3toelasticsearch",
+        "prefix": "/"
+    },
+    "elasticsearch": {
+        "url": "search-essearch-3h4uqclifeqaj2vg4mphe7ffle.us-east-2.es.amazonaws.com",
+        "port": "",
+        "username": "",
+        "password": ""
+    }
+}
