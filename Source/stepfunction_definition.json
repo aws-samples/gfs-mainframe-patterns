@@ -8,7 +8,7 @@
       "OutputPath": "$.Payload",
       "Parameters": {
         "Payload.$": "$",
-        "FunctionName": "arn:aws:lambda:us-east-2:130928527676:function:s3copybookparser:$LATEST"
+        "FunctionName": "arn:aws:lambda:us-west-2:130928527676:function:s3copybookparser:$LATEST"
       },
       "Retry": [
         {
@@ -30,7 +30,29 @@
       "OutputPath": "$.Payload",
       "Parameters": {
         "Payload.$": "$",
-        "FunctionName": "arn:aws:lambda:us-east-2:130928527676:function:s3toathena:$LATEST"
+        "FunctionName": "arn:aws:lambda:us-west-2:130928527676:function:s3toathena:$LATEST"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 6,
+          "BackoffRate": 2
+        }
+      ],
+      "Next": "S3LoadElasticSearch"
+    },
+    "S3LoadElasticSearch": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "Payload.$": "$",
+        "FunctionName": "arn:aws:lambda:us-west-2:130928527676:function:s3toelasticsearch:$LATEST"
       },
       "Retry": [
         {

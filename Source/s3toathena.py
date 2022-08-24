@@ -38,21 +38,23 @@ def lambda_handler(event, context):
     DataFile = event['s3_source_bucket_key'] #this s3 data file name passed from step function.  s3_source_bucket_key 
     DataFile_Formatted = DataFile.replace("-","_").replace("/","_").replace(".","_").replace("_txt","")
     
-    
-    #Creatimng WHERE Clause
+        #Creatimng WHERE Clause
     COLUMN = '"$path"'
     keyword = 's3://' + event['s3_source_bucket_name'] + '/' + event['s3_source_bucket_key']
     
     # number of retries
     RETRY_COUNT = 10
     
-    # query constant
-        
-    # get keyword
- #   keyword = event['name'] # Passed from Step Functions
-
     # athena client
     client = boto3.client('athena')
+    
+  
+    #--------------Create Database -  Query Execution-------------------    
+    response = client.start_query_execution(
+    QueryString='create database if not exists fileaiddemo',
+    ResultConfiguration={'OutputLocation': S3_BUCKET})
+    print("create table=",response)
+    
     
     #--------------Create Table Query Execution-------------------
     response = client.start_query_execution(
@@ -64,10 +66,10 @@ def lambda_handler(event, context):
             'OutputLocation': S3_BUCKET
         }
     )
-    print("createtable=",response)
+    print("create table=",response)
     
     
-    # get query execution id and get status
+    # -----------get query execution id and get status----------
     query_execution_id = response['QueryExecutionId']
     time.sleep(1)
     query_status = client.get_query_execution(QueryExecutionId=query_execution_id)
@@ -82,7 +84,7 @@ def lambda_handler(event, context):
             print("Create Table - STATUS:" + query_execution_status)
     
     
-        #-------------- Select query Execution------------------------------------
+    #-------------- Select query Execution------------------------------------
     query = "SELECT * FROM %s.%s where %s = '%s';" % (DATABASE, TABLE, COLUMN, keyword)
     #query = "UNLOAD (SELECT * FROM copybook_organization_cpy)  WITH (format = 'JSON');"
   
@@ -136,7 +138,7 @@ def lambda_handler(event, context):
     result = client.get_query_results(QueryExecutionId=query_execution_id)
   
 
-     #copies newly generated csv file with appropriate name
+    #copies newly generated csv file with appropriate name
     #query result output location you mentioned in AWS Athena
     print(filename)
     queryLoc = event['s3_copybook_bucket_name']  + "/output/" + queryId1 + ".csv"
@@ -167,3 +169,11 @@ def lambda_handler(event, context):
 
     # else:
     #     return None
+    
+    result_file_key = "results/"+ DataFile_Formatted + ".csv"
+        #pass through values
+    return {
+        's3_result_bucket_name': event['s3_source_bucket_name'],
+        's3_result_file_key': result_file_key
+  
+            }
