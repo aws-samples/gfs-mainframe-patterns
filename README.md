@@ -1,11 +1,8 @@
-## My Project
+## Advanced Mainframe File Viewer
 
-TODO: Fill this README out!
+File-AID is a widely used mainframe data management tool for browsing, viewing and editing files in table and column formats using metadata layouts (copybooks). A copybook is a section of COBOL code that defines data structures of a program. It holds metadata information (column name, size, type etc..) about a data file.
 
-Be sure to:
-
-* Change the title in this README
-* Edit your repository description on GitHub
+There are different patterns using which customers migrate and modernize their mainframe workloads to run on AWS. Many times, customers chose to retain the same mainframe file structure and layout for consistency while modernizing their workloads. A typical example is, batch applications transmitting files to external parties (with a specific file layout) and the same file layout needs to be retained for consistency even after the migration to AWS. Customers have been asking for an AWS solution that can help them browse and review files. The solution is expected to enable faster development and testing during the migration and support maintenance activities post the migration.
 
 ## Security
 
