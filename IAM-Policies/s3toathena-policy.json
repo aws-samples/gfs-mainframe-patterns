@@ -1,0 +1,66 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AthenaQueryExecution",
+      "Effect": "Allow",
+      "Action": [
+        "athena:StartQueryExecution",
+        "athena:GetQueryExecution",
+        "athena:GetQueryResults",
+        "athena:StopQueryExecution"
+      ],
+      "Resource": "arn:aws:athena:us-west-2:111122223333:workgroup/primary"
+    },
+    {
+      "Sid": "GlueCatalogForFileaidDatabase",
+      "Effect": "Allow",
+      "Action": [
+        "glue:CreateDatabase",
+        "glue:GetDatabase",
+        "glue:CreateTable",
+        "glue:GetTable",
+        "glue:GetPartitions"
+      ],
+      "Resource": [
+        "arn:aws:glue:us-west-2:111122223333:catalog",
+        "arn:aws:glue:us-west-2:111122223333:database/fileaiddemo",
+        "arn:aws:glue:us-west-2:111122223333:table/fileaiddemo/*"
+      ]
+    },
+    {
+      "Sid": "ReadInputFiles",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Resource": "arn:aws:s3:::amzn-s3-demo-bucket/input/*"
+    },
+    {
+      "Sid": "AthenaResultsAndCopiedOutput",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:DeleteObject",
+        "s3:AbortMultipartUpload",
+        "s3:ListMultipartUploadParts"
+      ],
+      "Resource": [
+        "arn:aws:s3:::amzn-s3-demo-bucket/output/*",
+        "arn:aws:s3:::amzn-s3-demo-bucket/query/*",
+        "arn:aws:s3:::amzn-s3-demo-bucket/results/*"
+      ]
+    },
+    {
+      "Sid": "ListBucket",
+      "Effect": "Allow",
+      "Action": [
+        "s3:ListBucket",
+        "s3:GetBucketLocation",
+        "s3:ListBucketMultipartUploads"
+      ],
+      "Resource": "arn:aws:s3:::amzn-s3-demo-bucket"
+    }
+  ]
+}

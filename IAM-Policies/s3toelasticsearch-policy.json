@@ -1,0 +1,22 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ReadAthenaResults",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Resource": "arn:aws:s3:::amzn-s3-demo-bucket/results/*"
+    },
+    {
+      "Sid": "WriteToOpenSearchDomain",
+      "Effect": "Allow",
+      "Action": [
+        "es:ESHttpHead",
+        "es:ESHttpPost"
+      ],
+      "Resource": "arn:aws:es:us-west-2:111122223333:domain/your-domain-name/*"
+    }
+  ]
+}

@@ -1,10 +1,10 @@
 {
     "s3": {
-        "bucket": "athenas3toelasticsearch",
+        "bucket": "amzn-s3-demo-bucket",
         "prefix": "/"
     },
     "elasticsearch": {
-        "url": "search-essearch-3h4uqclifeqaj2vg4mphe7ffle.us-east-2.es.amazonaws.com",
+        "url": "search-your-domain-name.us-west-2.es.amazonaws.com",
         "port": "",
         "username": "",
         "password": ""

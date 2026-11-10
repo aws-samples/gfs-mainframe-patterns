@@ -8,7 +8,7 @@
       "OutputPath": "$.Payload",
       "Parameters": {
         "Payload.$": "$",
-        "FunctionName": "arn:aws:lambda:us-west-2:130928527676:function:s3copybookparser:$LATEST"
+        "FunctionName": "arn:aws:lambda:us-west-2:111122223333:function:s3copybookparser:$LATEST"
       },
       "Retry": [
         {
@@ -30,7 +30,7 @@
       "OutputPath": "$.Payload",
       "Parameters": {
         "Payload.$": "$",
-        "FunctionName": "arn:aws:lambda:us-west-2:130928527676:function:s3toathena:$LATEST"
+        "FunctionName": "arn:aws:lambda:us-west-2:111122223333:function:s3toathena:$LATEST"
       },
       "Retry": [
         {
@@ -52,7 +52,7 @@
       "OutputPath": "$.Payload",
       "Parameters": {
         "Payload.$": "$",
-        "FunctionName": "arn:aws:lambda:us-west-2:130928527676:function:s3toelasticsearch:$LATEST"
+        "FunctionName": "arn:aws:lambda:us-west-2:111122223333:function:s3toelasticsearch:$LATEST"
       },
       "Retry": [
         {

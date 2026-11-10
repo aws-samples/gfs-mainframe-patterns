@@ -1,0 +1,12 @@
+{
+  "cluster_permissions": [
+    "cluster_monitor",
+    "indices:data/write/bulk"
+  ],
+  "index_permissions": [
+    {
+      "index_patterns": ["*.csv"],
+      "allowed_actions": ["create_index", "write"]
+    }
+  ]
+}

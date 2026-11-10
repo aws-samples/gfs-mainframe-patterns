@@ -1,3 +1,4 @@
+import re
 import time
 import boto3
 import logging
@@ -26,9 +27,22 @@ def lambda_handler(event, context):
     # athena constant
     DATABASE = 'fileaiddemo' # This is fixed for easy maitenance 
     TABLE = ""+ event['Derived_Table_Name'] +"" # Passed from Previous Copybook Parser Program
+    # Allow only valid Athena table names so the identifier cannot alter the SQL statement
+    if not re.fullmatch(r'[A-Za-z0-9_]{1,255}', TABLE):
+        raise ValueError("Invalid table name: " + TABLE)
     #TABLE = 'copybook_employee_cpy'
-    #Create_Table_Defn = """CREATE EXTERNAL TABLE IF NOT EXISTS copybook_employee_cpy (EMP_NUMBER int, EMP_LAST_NAME string, EMP_FIRST_NAME string, EMP_MID_INIT string, FILLER_1 string, EMP_TITLE string, EMP_NAIL_ID string, FILLER_2 string, EMP_DOB string ) ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.RegexSerDe' WITH SERDEPROPERTIES ( "input.regex" = "(.{5}) (.{15}) (.{25}) (.{1}) (.{2}) (.{30}) (.{9}) (.{1}) (.{10})")  LOCATION 's3://fileaid-demoinput/employee.txt'"""
+    #Create_Table_Defn = """CREATE EXTERNAL TABLE IF NOT EXISTS copybook_employee_cpy (EMP_NUMBER int, EMP_LAST_NAME string, EMP_FIRST_NAME string, EMP_MID_INIT string, FILLER_1 string, EMP_TITLE string, EMP_NAIL_ID string, FILLER_2 string, EMP_DOB string ) ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.RegexSerDe' WITH SERDEPROPERTIES ( "input.regex" = "(.{5}) (.{15}) (.{25}) (.{1}) (.{2}) (.{30}) (.{9}) (.{1}) (.{10})")  LOCATION 's3://amzn-s3-demo-source-bucket/employee.txt'"""
     Create_Table_Defn = "" + event['Derived_Table_Definition'] + ""
+    # Accept only the exact DDL shape produced by s3copybookparser.py for this table and source bucket
+    expected_location = "s3://" + event['s3_source_bucket_name'] + "/input"
+    if not re.fullmatch(r'[a-z0-9.\-]{3,63}', event['s3_source_bucket_name']):
+        raise ValueError("Invalid source bucket name")
+    ddl_pattern = (r" CREATE EXTERNAL TABLE IF NOT EXISTS " + TABLE + r" \([A-Za-z0-9_+, ]+ \)"
+                   r" ROW FORMAT SERDE 'org\.apache\.hadoop\.hive\.serde2\.RegexSerDe'"
+                   r' WITH SERDEPROPERTIES \( "input\.regex" = "(\(\.\{\d+\}\))+"\)'
+                   r" LOCATION '" + re.escape(expected_location) + r"'")
+    if not re.fullmatch(ddl_pattern, Create_Table_Defn):
+        raise ValueError("Unexpected table definition")
     
     #Pass to the above variable
     
@@ -85,13 +99,15 @@ def lambda_handler(event, context):
     
     
     #-------------- Select query Execution------------------------------------
-    query = "SELECT * FROM %s.%s where %s = '%s';" % (DATABASE, TABLE, COLUMN, keyword)
+    # DATABASE and COLUMN are constants and TABLE is validated above; the user supplied S3 path is bound as a query parameter
+    query = 'SELECT * FROM "' + DATABASE + '"."' + TABLE + '" WHERE ' + COLUMN + ' = ?'  # nosec B608
     #query = "UNLOAD (SELECT * FROM copybook_organization_cpy)  WITH (format = 'JSON');"
   
 
     # Execution of Select Query
     response = client.start_query_execution(
         QueryString=query,
+        ExecutionParameters=["'" + keyword.replace("'", "''") + "'"],
         QueryExecutionContext={
             'Database': DATABASE
         },
@@ -144,7 +160,7 @@ def lambda_handler(event, context):
     queryLoc = event['s3_copybook_bucket_name']  + "/output/" + queryId1 + ".csv"
     print(queryLoc)
     #destination location and file name
-    # s3_resource.Object('athenaresultstoes','Results/'+ DataFile_Formatted + '.csv').copy_from(CopySource = queryLoc) This is changed to make the results in the same bucket
+    # s3_resource.Object('amzn-s3-demo-results-bucket','Results/'+ DataFile_Formatted + '.csv').copy_from(CopySource = queryLoc) This is changed to make the results in the same bucket
     s3_resource.Object(event['s3_copybook_bucket_name'],'results/'+ DataFile_Formatted + '.csv').copy_from(CopySource = queryLoc)
     
     #deletes Athena generated csv and it's metadata file 
